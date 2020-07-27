@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+int main(int argc, char **argv)
+{{
+	int array[];
+	printf("Hi %s!!!\n", "Damian");
+	//test;asdfa
+	//asdfsdf
+	getchar();
+	/* asdfasdfasdf
+	 *
+	 *
+	 * getchar()*/
+	
+	puts("The end"));
+
+
+	return 0;
+}
