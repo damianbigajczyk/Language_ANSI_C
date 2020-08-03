@@ -24,6 +24,8 @@ exercise_5.o: exercise_5.c exercise_5.h
 	@echo "creating object.."
 	$(CC) -c exercise_5.c
 
+${BIN}.o: exercise_5.o
+
 clean:
 	@echo "Cleaning up..."
 	@$(RM)
