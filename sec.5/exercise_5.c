@@ -1,10 +1,16 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 #include "exercise_5.h"
 
 #define BUFSIZE 100
 #define ALLOCSIZE 10000
+
+static char daytab[2][13] = {
+	{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
+	{0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+};
 
 static char buf[BUFSIZE];
 static int bufp;
@@ -246,6 +252,63 @@ int readlines_ver2(char *lineptr[], char *linebuf, int maxlines)
 			p += len;
 		}
 	return nlines;
+}
+int day_of_year(uint16_t year, uint8_t month, uint16_t day)
+{
+	int leap;
+
+	leap = year%4 == 0 && year%100 != 0 || year%400 == 0;
+	if (!(year && month && day) || month > 12 || day > daytab[leap][month])
+		return -1;
+	for (int i = 0; i < month; i++)
+		day += daytab[leap][i];
+	return day;
+}
+void month_day(uint16_t year, uint16_t yearday, uint8_t *pmonth, uint8_t *pday)
+{
+	int i, leap;
+
+	if (!year || !yearday) {
+		*pmonth = 0;
+		*pday = 0;
+		return;
+	}
+	leap = year%4 == 0 && year%100 != 0 || year%400 == 0;
+	for (i = 1; yearday > daytab[leap][i]; i++)
+		yearday -= daytab[leap][i];
+	if (i > 12 && yearday > daytab[leap][12]) {
+		*pmonth = 0;
+		*pday = 0;
+	} else {
+		*pmonth = i;
+		*pday = yearday;
+	}
+}
+int day_of_year_ver2(int year, int month, int day)
+{
+	int leap = year%4 == 0 && year%100 != 0 || year%400 == 0;
+	char *p = daytab[leap];
+
+	if (year <= 0 || month < 1 || month > 12 || day < 1 || day > daytab[leap][month])
+		return -1;
+	while (--month)
+		day += *++p;
+	return day;
+}
+void month_day_ver2(int year, int yearday, int *pmonth, int *pday)
+{
+	int leap = year%4 == 0 && year%100 != 0 || year%400 == 0;
+	char *p = daytab[leap];
+	int limit = (leap) ? 366: 365;	
+	if (year <= 0 || yearday < 1 || yearday > limit) {
+		*pmonth = -1;
+		*pday = -1;
+		return;
+	}
+	while (yearday > *++p)
+		yearday -= *p;
+	*pmonth = p - *(daytab + leap);
+	*pday = yearday;
 }
 
 /***************** Static functions ****************/

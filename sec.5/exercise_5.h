@@ -20,5 +20,9 @@ void clearHeap(char *lineptr[], int nlines);
 void writelines(char *lineptr[], int nlines);
 void qsort(char *lineptr[], int left, int right);
 int readlines_ver2(char *lineptr[], char *linebuf, int nlines);
+int day_of_year(__uint16_t year, __uint8_t month, __uint16_t day);
+void month_day(__uint16_t year, __uint16_t yearday, __uint8_t *pmonth, __uint8_t *pday);
+int day_of_year_ver2(int year, int month, int day);
+void month_day_ver2(int year, int yearday, int *pmonth, int *pday);
 
 #endif
