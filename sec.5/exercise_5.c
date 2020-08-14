@@ -6,6 +6,9 @@
 
 #define BUFSIZE 100
 #define ALLOCSIZE 10000
+#define TABINC 6
+#define YES 1
+#define NO 0
 
 static char daytab[2][13] = {
 	{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
@@ -13,10 +16,13 @@ static char daytab[2][13] = {
 };
 
 static char buf[BUFSIZE];
-static int bufp;
+static int bufp = 0;
 
 static char allocbuf[ALLOCSIZE];
 static char *allocp = allocbuf;
+
+static int sp = 0;
+static double val[MAX];
 
 static int getch(void);
 static void ungetch(int c);
@@ -310,8 +316,185 @@ void month_day_ver2(int year, int yearday, int *pmonth, int *pday)
 	*pmonth = p - *(daytab + leap);
 	*pday = yearday;
 }
+int getop(char *s)
+{
+	int c;
+
+	while ((*s = c = getch()) == ' ' || c == '\t')
+		;
+	*(s+1) = '\0';
+	if (!isdigit(c) && c != '.' && c != '-')
+		return c;
+	if (c == '-')
+		if (isdigit(c = getch()))
+			*++s = c;
+		else {
+			if (c != EOF)
+				ungetch(c);
+			return '-';
+		}
+	if (isdigit(c))
+		while (isdigit(*++s = c = getch()))
+			;
+	if (c == '.')
+		while (isdigit(*++s = c = getch()))
+			;
+	*s = '\0';
+	if (c != EOF)
+		ungetch(c);
+	return NUMBER;
+}
+double atof(char *s)
+{
+	double val, power;
+	int sign;
+
+	for ( ; isspace(*s); ++s)
+		;
+	sign = (*s == '-') ? -1 : 1;
+	if (*s == '+' || *s == '-')
+		++s;
+	for (val = 0.0; isdigit(*s); ++s)
+		val = 10.0 * val + (*s - '0');
+	if (*s == '.')
+		++s;
+	for (power = 1.0; isdigit(*s); ++s) {
+		val = 10.0 * val + (*s - '0');
+		power *= 10;
+	}
+	return sign * val / power;
+}
+void ungets(char *s)
+{
+	int len = strlen(s);
+
+	while (len > 0)
+		ungetch(*(s + --len));
+}
+void push(double number)
+{
+	if (sp < MAX)
+		val[sp++] = number;
+	else
+		printf("Error: stack full, can't push %g\n", number);
+}
+double pop(void)
+{
+	if (sp > 0)
+		return val[--sp];
+	else {
+		printf("Error: stack empty\n");
+		return 0.0;
+	}
+}
+void settab(int argc, char **argv, char *s)
+{
+	int i, pos;
+
+	if (argc == 1)
+		for (i = 1; i <= MAX; i++)
+			s[i] = (i % TABINC == 0) ? YES : NO;
+	else {
+		for (i = 1; i < MAX; i++)
+			s[i] = NO;
+		while (--argc > 0) {
+			pos = atoi_2(*++argv);
+			if (pos > 0 && pos <= MAX)
+				s[pos] = YES;
+		}
+	}
+}
+void entab(char *s)
+{
+	int c, pos;
+	int nb = 0;
+	int nt = 0;
+
+	for (pos = 1; (c = getchar()) != EOF; pos++)
+		if (c == ' ') {
+			if (tabpos(pos, s) == NO)
+				++nb;
+			else {
+				nb = 0;
+				++nt;
+			}
+		} else {
+			for ( ; nt > 0; nt--)
+				putchar('\t');
+			if (c == '\t')
+				nb = 0;
+			else
+				for ( ; nb > 0; nb--)
+					putchar(' ');
+			putchar(c);
+			if (c == '\n')
+				pos = 0;
+			else if (c == '\t')
+				while (tabpos(pos, s) != YES)
+						++pos;
+		}
+}
+void detab(char *s)
+{
+	int c, pos = 1;
+	
+	while ((c = getchar()) != EOF) {
+		if (c == '\t')
+			do
+				putchar(' ');
+			while (tabpos(pos++, s) != YES);
+		else if (c == '\n') {
+			putchar(c);
+			pos = 1;
+		} else {
+			putchar(c);
+			++pos;
+		}
+	}
+}
+int tabpos(int pos, char *s)
+{
+	return (pos > MAX) ? YES : s[pos];
+}
+int atoi_2(char *s)
+{
+	int value = 0;
+
+	while (isdigit(*s))
+		value = 10 * value + *s++ - '0';
+	return value;
+}
+void esettab(int argc, char **argv, char *s)
+{
+	int i, inc, pos;
+
+	if (argc == 1)
+		for (i = 1; i <= MAX; i++)
+			s[i] = (i % TABINC == 0) ? YES : NO;
+	else if (argc == 3 && *argv[1] == '-' && *argv[2] == '+') {
+		pos = atoi_2(*(argv + 1) + 1);
+		inc = atoi_2(*(argv + 2) + 1);
+		for (i = 1; i <= MAX; i++)
+			if (i != pos)
+				s[i] = NO;
+			else {
+				s[i] = YES;
+				pos += inc;
+			}
+		} else {
+		for (i = 1; i < MAX; i++)
+			s[i] = NO;
+		while (--argc > 0) {
+			pos = atoi_2(*++argv);
+			if (pos > 0 && pos <= MAX)
+				s[pos] = YES;
+		}
+	}
+	
+}
 
 /***************** Static functions ****************/
+
 static int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
@@ -321,7 +504,7 @@ static void ungetch(int c)
 	if (bufp < BUFSIZE)
 		buf[bufp++] = c;
 	else
-		printf("Error: buffer is full");
+		printf("Error: buffer is full\n");
 }
 static int getLine(char *line, size_t n)
 {
