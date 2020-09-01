@@ -1,13 +1,12 @@
 #include <stdio.h>
-#include "exercise_5.h"
+#include "mystring.h"
 
 int main(void)
 {
 	char fullname[20] = "Damian ";
 	char add[] = "Bigajczyk";
 
-	printf("%s\n", strcat(fullname, add));
-
+	printf("%s\n", mystrcat(fullname, add));
 
 	return 0;
 }

@@ -25,8 +25,5 @@ int main(void)
 	month_day(2000, 1, &month, &day);
 	printf("Month: %hu\tDay: %hu\n", month, day);
 
-
-
-
 	return 0;
 }

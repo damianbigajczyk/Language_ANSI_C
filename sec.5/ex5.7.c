@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "exercise_5.h"
+#include "sort.h"
 
 #define MAXLINES 5000
 
@@ -14,7 +15,7 @@ int main(void)
 
 	start = clock();
 	if ((nlines = readlines_ver2(lineptr, linebuf, MAXLINES)) >= 0) {
-		qsort(lineptr, 0, nlines-1);
+		qsort_1(lineptr, 0, nlines-1);
 		writelines(lineptr, nlines);
 	} else {
 		fprintf(stderr, "Error: input too big to sort\n");
