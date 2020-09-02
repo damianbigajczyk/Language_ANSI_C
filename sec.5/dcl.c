@@ -48,6 +48,14 @@ int gettoken(void)
 	} else
 		return tokentype = c;
 }
+int nexttoken(void)
+{
+	int type;
+
+	type = gettoken();
+	prevtoken = YES;
+	return type;
+}
 void dcl(void)
 {
 	int ns;

@@ -11,5 +11,6 @@ void dcl(void);
 void undcl(void);
 void dirdcl(void);
 int gettoken(void);
+int nexttoken(void);
 
 #endif

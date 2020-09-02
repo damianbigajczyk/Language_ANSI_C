@@ -69,6 +69,9 @@ ex5.17: ex5.17.o $(BASE) sort.o mystring.o
 ex5.18: ex5.18.o dcl.o
 	$(CC) $(CFLAGS) -o ex5.18 ex5.18.o dcl.o
 
+ex5.19: ex5.19.o dcl.o
+	$(CC) $(CFLAGS) -o ex5.19 ex5.19.o dcl.o
+
 sortlines: sortlines.o $(BASE) sort.o mystring.o
 	$(CC) $(CFLAGS) -o sortlines sortlines.o $(BASE) sort.o mystring.o
 
